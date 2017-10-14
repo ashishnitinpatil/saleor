@@ -176,10 +176,11 @@ INSTALLED_APPS = [
     'graphene_django',
     'mptt',
     'payments',
-    'rest_framework',
     'webpack_loader',
     'social_django',
     'django_countries',
+    'django_filters',
+    'django_celery_results',
 ]
 
 LOGGING = {
@@ -270,6 +271,7 @@ LOW_STOCK_THRESHOLD = 10
 MAX_CART_LINE_QUANTITY = os.environ.get('MAX_CART_LINE_QUANTITY', 50)
 
 PAGINATE_BY = 16
+DASHBOARD_PAGINATE_BY = 30
 
 BOOTSTRAP3 = {
     'set_placeholder': False,
@@ -351,7 +353,7 @@ ES_URL = ELASTICSEARCH_URL or SEARCHBOX_URL or BONSAI_URL or ''
 if ES_URL:
     SEARCH_BACKENDS = {
         'default': {
-            'BACKEND': 'saleor.search.backends.elasticsearch2',
+            'BACKEND': 'saleor.search.backends.elasticsearch5',
             'URLS': [ES_URL],
             'INDEX': os.environ.get('ELASTICSEARCH_INDEX_NAME', 'storefront'),
             'TIMEOUT': 5,
@@ -401,3 +403,11 @@ SOCIAL_AUTH_USER_MODEL = AUTH_USER_MODEL
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id, email'}
+
+# CELERY SETTINGS
+CELERY_BROKER_URL = os.environ.get('REDIS_BROKER_URL') or ''
+CELERY_TASK_ALWAYS_EAGER = False if CELERY_BROKER_URL else True
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
